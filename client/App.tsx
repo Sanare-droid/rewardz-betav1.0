@@ -1,6 +1,8 @@
 import "./global.css";
 import { useEffect } from "react";
 import "@/lib/fetchPatch";
+import PWAInstaller from "@/components/PWAInstaller";
+import { initializePushNotifications } from "@/lib/pushNotifications";
 
 import { Toaster } from "@/components/ui/toaster";
 import { createRoot } from "react-dom/client";
@@ -47,22 +49,29 @@ import SavedSearches from "./pages/SavedSearchesEnhanced";
 import Pets from "./pages/Pets";
 import PetEdit from "./pages/PetEdit";
 import PetView from "./pages/PetView";
-import Admin from "./pages/Admin";
+import Admin from "./pages/AdminDashboard";
 import PetOnboarding from "./pages/PetOnboarding";
 import { UserProvider } from "./context/UserContext";
 import GlobalErrors from "@/components/GlobalErrors";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+const App = () => {
+  useEffect(() => {
+    // Initialize push notifications
+    initializePushNotifications();
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
         <GlobalErrors />
-      <Toaster />
-      <Sonner />
-      <UserProvider>
-        <BrowserRouter>
-          <Routes>
+        <Toaster />
+        <Sonner />
+        <PWAInstaller />
+        <UserProvider>
+          <BrowserRouter>
+            <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/alerts" element={<Alerts />} />
             <Route path="/alerts/map" element={<AlertsMap />} />
@@ -199,7 +208,8 @@ const App = () => (
       </UserProvider>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 const rootEl = document.getElementById("root");
 if (rootEl) {
