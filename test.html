@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rewardz Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐾 Rewardz API Test</h1>
+        <p>This page tests the Rewardz API endpoints to ensure everything is working correctly.</p>
+        
+        <div id="status"></div>
+        
+        <div>
+            <button onclick="testEndpoint('/health')">Test Health</button>
+            <button onclick="testEndpoint('/api/ping')">Test Ping</button>
+            <button onclick="testEndpoint('/api/demo')">Test Demo</button>
+            <button onclick="testEndpoint('/api/health')">Test API Health</button>
+            <button onclick="testAll()">Test All</button>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const statusDiv = document.getElementById('status');
+        const resultsDiv = document.getElementById('results');
+        
+        function showStatus(message, type = 'success') {
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        async function testEndpoint(path) {
+            try {
+                showStatus(`Testing ${path}...`, 'success');
+                
+                const response = await fetch(path);
+                const data = await response.json();
+                
+                const result = `
+                    <div class="status ${response.ok ? 'success' : 'error'}">
+                        <strong>${path}</strong> - Status: ${response.status}
+                    </div>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                
+                resultsDiv.innerHTML = result;
+                
+                if (response.ok) {
+                    showStatus(`✅ ${path} - Success!`, 'success');
+                } else {
+                    showStatus(`❌ ${path} - Failed!`, 'error');
+                }
+                
+            } catch (error) {
+                showStatus(`❌ ${path} - Error: ${error.message}`, 'error');
+                resultsDiv.innerHTML = `<div class="status error">Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function testAll() {
+            showStatus('Testing all endpoints...', 'success');
+            resultsDiv.innerHTML = '';
+            
+            const endpoints = ['/health', '/api/ping', '/api/demo', '/api/health'];
+            let passed = 0;
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(endpoint);
+                    if (response.ok) {
+                        passed++;
+                        resultsDiv.innerHTML += `<div class="status success">✅ ${endpoint} - OK</div>`;
+                    } else {
+                        resultsDiv.innerHTML += `<div class="status error">❌ ${endpoint} - ${response.status}</div>`;
+                    }
+                } catch (error) {
+                    resultsDiv.innerHTML += `<div class="status error">❌ ${endpoint} - ${error.message}</div>`;
+                }
+            }
+            
+            showStatus(`📊 Results: ${passed}/${endpoints.length} tests passed`, passed === endpoints.length ? 'success' : 'error');
+        }
+        
+        // Auto-test on page load
+        window.onload = () => {
+            testAll();
+        };
+    </script>
+</body>
+</html>

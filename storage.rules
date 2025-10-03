@@ -1,0 +1,26 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() { return request.auth != null; }
+    function isImage() { return request.resource.contentType.matches('image/.*'); }
+    function smallFile() { return request.resource.size < 5 * 1024 * 1024; }
+
+    // Post images
+    match /posts/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.uid == userId && isImage() && smallFile();
+    }
+
+    // Report images
+    match /reports/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.uid == userId && isImage() && smallFile();
+    }
+
+    // Pet images
+    match /pets/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.uid == userId && isImage() && smallFile();
+    }
+  }
+}

@@ -1,0 +1,30 @@
+# Copy this content to a .env file in your project root
+
+# Development Environment Variables
+NODE_ENV=development
+LOG_LEVEL=info
+ALLOWED_ORIGINS=http://localhost:8080,http://127.0.0.1:8080
+PING_MESSAGE=Rewardz API is running
+
+# Firebase Configuration (Required for frontend)
+VITE_FIREBASE_API_KEY=AIzaSyCjTTB7gDwdxHUUTH9aZg7rRwJ8knzE3LM
+VITE_FIREBASE_AUTH_DOMAIN=rewardz-fe98e.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=rewardz-fe98e
+VITE_FIREBASE_STORAGE_BUCKET=rewardz-fe98e.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=429394245504
+VITE_FIREBASE_APP_ID=1:429394245504:web:706cc538e61c7b2869b365
+
+# Server-side API Keys (Optional - for full functionality)
+# Stripe Payment Processing
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
+
+# PayPal Payment Processing  
+PAYPAL_CLIENT_ID=your_paypal_client_id
+PAYPAL_CLIENT_SECRET=your_paypal_client_secret
+
+# Email Service (Resend)
+RESEND_API_KEY=re_your_resend_api_key
+
+# Google Vision API
+GOOGLE_VISION_API_KEY=your_google_vision_api_key
