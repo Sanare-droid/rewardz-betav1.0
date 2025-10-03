@@ -72,7 +72,8 @@ export default function Signup() {
               if (pwErr) throw new Error(pwErr);
               if (password !== confirm) throw new Error("Passwords do not match");
               await signup(name, email, password);
-              navigate("/");
+              // New users should go to pet onboarding
+              navigate("/pet-onboarding");
             } catch (e: any) {
               setError(friendlyAuthError(e));
             } finally {

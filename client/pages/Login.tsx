@@ -72,28 +72,38 @@ export default function Login() {
               const password = passwordRef.current?.value || "";
               await login(email, password);
               
-              // Small delay to ensure auth state is updated
-              setTimeout(async () => {
-                // Check if user has pets after login
-                const { auth } = await import("@/lib/firebase");
-                if (auth.currentUser) {
+              // Wait a moment for auth to stabilize
+              await new Promise(resolve => setTimeout(resolve, 500));
+              
+              // Check if user has pets after login
+              const { auth } = await import("@/lib/firebase");
+              if (auth.currentUser) {
+                try {
                   const petsSnapshot = await getDocs(
                     collection(db, "users", auth.currentUser.uid, "pets")
                   );
                   
                   if (petsSnapshot.empty) {
                     // No pets, go to pet onboarding
+                    console.log("No pets found, redirecting to pet onboarding");
                     navigate("/pet-onboarding");
                   } else {
                     // Has pets, go to home
+                    console.log("Pets found, redirecting to home");
                     navigate("/");
                   }
-                } else {
+                } catch (error) {
+                  console.error("Error checking pets:", error);
+                  // If we can't check pets, go to home
                   navigate("/");
                 }
-              }, 500);
+              } else {
+                // No current user, go to home (shouldn't happen)
+                navigate("/");
+              }
             } catch (e: any) {
               setError(friendlyAuthError(e));
+            } finally {
               setLoading(false);
             }
           }}

@@ -7,12 +7,22 @@
 
 /* Global image fixes to prevent stretching/zooming */
 @layer components {
+  /* Default image behavior - maintain aspect ratio */
   img {
     @apply max-w-full h-auto;
-    object-fit: cover;
   }
   
-  /* Fix for avatar images */
+  /* For images that should fill containers */
+  img.object-cover {
+    @apply object-cover;
+  }
+  
+  /* For images that should fit within containers without cropping */
+  img.object-contain {
+    @apply object-contain;
+  }
+  
+  /* Fix for avatar images - always cover */
   .avatar-image, [class*="rounded-full"] img {
     @apply object-cover;
   }
@@ -25,6 +35,11 @@
   /* Aspect ratio containers */
   .aspect-container img {
     @apply w-full h-full object-cover;
+  }
+  
+  /* Onboarding images should not be cropped */
+  .onboarding-image {
+    @apply w-full h-full object-contain;
   }
 }
 
