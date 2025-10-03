@@ -66,25 +66,33 @@ export default function Messages() {
           },
           (err: any) => {
             console.error("collectionGroup messages error", err);
-            toast({
-              title: "Firestore error",
-              description: err?.message || "CollectionGroup listener error",
-            });
+            // Don't show error toast for index issues, handle gracefully
+            if (!err?.message?.includes('index')) {
+              toast({
+                title: "Messages loading error",
+                description: "Some messages may not be visible",
+              });
+            }
           },
         );
       } catch (err: any) {
-        // Likely a missing index — inform user and run fallback scan directly
-        console.error("collectionGroup pre-check failed", err);
+        // Likely a missing index — inform user once and provide link
+        console.log("CollectionGroup query needs index:", err);
         const msg = err?.message || "Firestore collectionGroup error";
         const link =
           err?.message?.match(
             /https:\/\/console\.firebase\.google\.com\S+/,
           )?.[0] ||
           `https://console.firebase.google.com/project/${import.meta.env.VITE_FIREBASE_PROJECT_ID}/firestore/indexes`;
-        toast({
-          title: "Missing Firestore index",
-          description: `Create index: ${link}`,
-        });
+        // Only show the toast once per session
+        const indexToastShown = sessionStorage.getItem('indexToastShown');
+        if (!indexToastShown) {
+          sessionStorage.setItem('indexToastShown', 'true');
+          toast({
+            title: "Setting up messages",
+            description: `First-time setup: ${link}`,
+          });
+        }
 
         // Fallback: scan recent reports and check their messages subcollection for messages by this user.
         (async () => {
