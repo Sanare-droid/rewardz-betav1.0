@@ -175,12 +175,7 @@ class PushNotificationManager {
       // Show toast notification
       toast({
         title: payload.notification?.title || 'New Notification',
-        description: payload.notification?.body,
-        action: payload.data?.actionUrl ? (
-          <a href={payload.data.actionUrl} className="underline">
-            View
-          </a>
-        ) : undefined
+        description: `${payload.notification?.body}${payload.data?.actionUrl ? ` - ${payload.data.actionUrl}` : ''}`,
       });
 
       // Also show browser notification if page is not focused

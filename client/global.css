@@ -5,6 +5,29 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global image fixes to prevent stretching/zooming */
+@layer components {
+  img {
+    @apply max-w-full h-auto;
+    object-fit: cover;
+  }
+  
+  /* Fix for avatar images */
+  .avatar-image, [class*="rounded-full"] img {
+    @apply object-cover;
+  }
+  
+  /* Fix for card images */
+  .card-image, .report-image, .pet-image {
+    @apply w-full h-full object-cover object-center;
+  }
+  
+  /* Aspect ratio containers */
+  .aspect-container img {
+    @apply w-full h-full object-cover;
+  }
+}
+
 @layer base {
   /**
    * Tailwind CSS theme

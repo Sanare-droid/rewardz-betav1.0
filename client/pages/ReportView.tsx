@@ -310,10 +310,12 @@ export default function ReportView() {
               </div>
               {s.note && <div className="text-sm mt-1">{s.note}</div>}
               {s.photoUrl && (
-                <img
-                  src={s.photoUrl}
-                  className="mt-2 h-32 w-full object-cover rounded-lg"
-                />
+                <div className="mt-2 h-32 w-full rounded-lg overflow-hidden bg-muted">
+                  <img
+                    src={s.photoUrl}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               )}
               <div className="text-xs text-gray-500 mt-1">
                 Approximate location shown for privacy

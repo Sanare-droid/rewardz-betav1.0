@@ -272,12 +272,7 @@ export function subscribeToNotifications(
         const latest = notifications[0];
         toast({
           title: latest.title,
-          description: latest.message,
-          action: latest.actionUrl ? (
-            <a href={latest.actionUrl} className="underline">
-              View
-            </a>
-          ) : undefined
+          description: `${latest.message}${latest.actionUrl ? ` - ${latest.actionUrl}` : ''}`,
         });
       }
       

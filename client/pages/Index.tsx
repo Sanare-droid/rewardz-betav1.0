@@ -143,7 +143,7 @@ export default function Index() {
                 <img
                   src="https://cdn.builder.io/api/v1/image/assets%2F0f7bde685416479ab2cfdd2fa6980d09%2F6d2e3cc66b8e4929b3a236354b8ea6e1?format=webp&width=1200"
                   alt="Rewardz community hero"
-                  className="absolute inset-0 w-full h-full object-contain"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>
             </div>
@@ -231,7 +231,7 @@ function AlertCard({
               <img
                 src={image}
                 alt="Pet"
-                className="h-full w-full object-cover"
+                className="absolute inset-0 h-full w-full object-cover"
               />
             </AspectRatio>
           </div>

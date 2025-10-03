@@ -39,10 +39,12 @@ function PostCard({ postId, post, onComment }: any) {
   return (
     <article className="rounded-2xl border overflow-hidden">
       <header className="px-4 pt-4 flex items-center gap-3">
-        <img
-          src={post.avatar || "https://i.pravatar.cc/80"}
-          className="h-9 w-9 rounded-full object-cover"
-        />
+        <div className="h-9 w-9 rounded-full overflow-hidden bg-muted flex-shrink-0">
+          <img
+            src={post.avatar || "https://i.pravatar.cc/80"}
+            className="w-full h-full object-cover"
+          />
+        </div>
         <div>
           <div className="font-medium">
             {post.author || "Member"} • Community
@@ -51,7 +53,9 @@ function PostCard({ postId, post, onComment }: any) {
         </div>
       </header>
       {post.image && (
-        <img src={post.image} className="h-48 w-full object-cover" />
+        <div className="h-48 w-full overflow-hidden bg-muted">
+          <img src={post.image} className="w-full h-full object-cover" />
+        </div>
       )}
       <div className="p-4">
         <p>{post.text}</p>
