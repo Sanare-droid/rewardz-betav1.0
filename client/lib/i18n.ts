@@ -1,492 +1,484 @@
 /**
- * Internationalization (i18n) support for Rewardz
- * Simple translation system with support for multiple languages
+ * Internationalization (i18n) Support for Rewardz
  */
 
-import { useState, useEffect } from 'react';
+import { createContext, useContext } from 'react';
 
-export type Language = 'en' | 'es' | 'fr' | 'sw' | 'zu';
+// Supported languages
+export const LANGUAGES = {
+  en: 'English',
+  es: 'Español',
+  fr: 'Français',
+  de: 'Deutsch',
+  pt: 'Português',
+  zh: '中文',
+  ar: 'العربية',
+  hi: 'हिन्दी',
+  sw: 'Kiswahili'
+} as const;
 
+export type LanguageCode = keyof typeof LANGUAGES;
+
+// Translation keys
 export interface Translations {
-  [key: string]: string | Translations;
+  // Navigation
+  'nav.home': string;
+  'nav.search': string;
+  'nav.alerts': string;
+  'nav.community': string;
+  'nav.profile': string;
+  'nav.messages': string;
+  'nav.notifications': string;
+  
+  // Common
+  'common.loading': string;
+  'common.error': string;
+  'common.success': string;
+  'common.save': string;
+  'common.cancel': string;
+  'common.delete': string;
+  'common.edit': string;
+  'common.view': string;
+  'common.share': string;
+  'common.download': string;
+  'common.search': string;
+  'common.filter': string;
+  'common.sort': string;
+  'common.back': string;
+  'common.next': string;
+  'common.submit': string;
+  'common.close': string;
+  
+  // Auth
+  'auth.login': string;
+  'auth.signup': string;
+  'auth.logout': string;
+  'auth.forgotPassword': string;
+  'auth.resetPassword': string;
+  'auth.email': string;
+  'auth.password': string;
+  'auth.confirmPassword': string;
+  'auth.name': string;
+  
+  // Pet Report
+  'report.lost': string;
+  'report.found': string;
+  'report.title': string;
+  'report.petName': string;
+  'report.species': string;
+  'report.breed': string;
+  'report.color': string;
+  'report.location': string;
+  'report.lastSeen': string;
+  'report.reward': string;
+  'report.description': string;
+  'report.contact': string;
+  'report.status.open': string;
+  'report.status.closed': string;
+  'report.status.reunited': string;
+  
+  // Matching
+  'match.title': string;
+  'match.score': string;
+  'match.confidence': string;
+  'match.reasons': string;
+  'match.accept': string;
+  'match.reject': string;
+  'match.contact': string;
+  
+  // Messages
+  'messages.title': string;
+  'messages.newMessage': string;
+  'messages.send': string;
+  'messages.typeMessage': string;
+  'messages.noMessages': string;
+  'messages.unread': string;
+  
+  // Notifications
+  'notifications.title': string;
+  'notifications.markRead': string;
+  'notifications.markAllRead': string;
+  'notifications.noNotifications': string;
+  'notifications.settings': string;
+  
+  // Community
+  'community.leaderboard': string;
+  'community.points': string;
+  'community.rank': string;
+  'community.badges': string;
+  'community.posts': string;
+  'community.comments': string;
+  
+  // Settings
+  'settings.title': string;
+  'settings.account': string;
+  'settings.privacy': string;
+  'settings.notifications': string;
+  'settings.language': string;
+  'settings.theme': string;
+  'settings.help': string;
+  
+  // Success Messages
+  'success.reportCreated': string;
+  'success.reportUpdated': string;
+  'success.reportDeleted': string;
+  'success.matchFound': string;
+  'success.messageSent': string;
+  'success.profileUpdated': string;
+  
+  // Error Messages
+  'error.generic': string;
+  'error.network': string;
+  'error.notFound': string;
+  'error.unauthorized': string;
+  'error.validation': string;
+  'error.fileSize': string;
 }
 
 // English translations (default)
 const en: Translations = {
-  common: {
-    appName: 'Rewardz',
-    tagline: 'Bringing Lost Pets Home',
-    search: 'Search',
-    cancel: 'Cancel',
-    save: 'Save',
-    delete: 'Delete',
-    edit: 'Edit',
-    loading: 'Loading...',
-    error: 'Error',
-    success: 'Success',
-    confirm: 'Confirm',
-    back: 'Back',
-    next: 'Next',
-    submit: 'Submit',
-    close: 'Close',
-    share: 'Share',
-    download: 'Download',
-    print: 'Print'
-  },
-  navigation: {
-    home: 'Home',
-    alerts: 'Alerts',
-    search: 'Search',
-    community: 'Community',
-    profile: 'Profile',
-    messages: 'Messages',
-    notifications: 'Notifications',
-    settings: 'Settings',
-    help: 'Help',
-    logout: 'Logout'
-  },
-  pet: {
-    lost: 'Lost',
-    found: 'Found',
-    reunited: 'Reunited',
-    species: 'Species',
-    breed: 'Breed',
-    color: 'Color',
-    name: 'Name',
-    description: 'Description',
-    lastSeen: 'Last Seen',
-    foundAt: 'Found At',
-    reward: 'Reward',
-    microchip: 'Microchip ID'
-  },
-  actions: {
-    reportLost: 'Report Lost Pet',
-    reportFound: 'Report Found Pet',
-    viewDetails: 'View Details',
-    contact: 'Contact',
-    markReunited: 'Mark as Reunited',
-    claimReward: 'Claim Reward',
-    sendMessage: 'Send Message',
-    createPoster: 'Create Poster',
-    viewOnMap: 'View on Map'
-  },
-  messages: {
-    welcome: 'Welcome back, {{name}}!',
-    noResults: 'No results found',
-    matchFound: 'Potential match found!',
-    reportCreated: 'Report created successfully',
-    reportUpdated: 'Report updated successfully',
-    reportDeleted: 'Report deleted successfully',
-    messageSent: 'Message sent',
-    notificationSent: 'Notification sent',
-    errorOccurred: 'An error occurred. Please try again.',
-    permissionDenied: 'Permission denied',
-    loginRequired: 'Please login to continue'
-  },
-  auth: {
-    login: 'Login',
-    signup: 'Sign Up',
-    email: 'Email',
-    password: 'Password',
-    confirmPassword: 'Confirm Password',
-    forgotPassword: 'Forgot Password?',
-    resetPassword: 'Reset Password',
-    name: 'Name',
-    phone: 'Phone',
-    createAccount: 'Create Account',
-    alreadyHaveAccount: 'Already have an account?',
-    dontHaveAccount: "Don't have an account?"
-  }
+  // Navigation
+  'nav.home': 'Home',
+  'nav.search': 'Search',
+  'nav.alerts': 'Alerts',
+  'nav.community': 'Community',
+  'nav.profile': 'Profile',
+  'nav.messages': 'Messages',
+  'nav.notifications': 'Notifications',
+  
+  // Common
+  'common.loading': 'Loading...',
+  'common.error': 'Error',
+  'common.success': 'Success',
+  'common.save': 'Save',
+  'common.cancel': 'Cancel',
+  'common.delete': 'Delete',
+  'common.edit': 'Edit',
+  'common.view': 'View',
+  'common.share': 'Share',
+  'common.download': 'Download',
+  'common.search': 'Search',
+  'common.filter': 'Filter',
+  'common.sort': 'Sort',
+  'common.back': 'Back',
+  'common.next': 'Next',
+  'common.submit': 'Submit',
+  'common.close': 'Close',
+  
+  // Auth
+  'auth.login': 'Log In',
+  'auth.signup': 'Sign Up',
+  'auth.logout': 'Log Out',
+  'auth.forgotPassword': 'Forgot Password?',
+  'auth.resetPassword': 'Reset Password',
+  'auth.email': 'Email',
+  'auth.password': 'Password',
+  'auth.confirmPassword': 'Confirm Password',
+  'auth.name': 'Name',
+  
+  // Pet Report
+  'report.lost': 'Lost',
+  'report.found': 'Found',
+  'report.title': 'Report Pet',
+  'report.petName': 'Pet Name',
+  'report.species': 'Species',
+  'report.breed': 'Breed',
+  'report.color': 'Color',
+  'report.location': 'Location',
+  'report.lastSeen': 'Last Seen',
+  'report.reward': 'Reward',
+  'report.description': 'Description',
+  'report.contact': 'Contact',
+  'report.status.open': 'Open',
+  'report.status.closed': 'Closed',
+  'report.status.reunited': 'Reunited',
+  
+  // Matching
+  'match.title': 'Potential Match Found!',
+  'match.score': 'Match Score',
+  'match.confidence': 'Confidence',
+  'match.reasons': 'Why we think it\'s a match',
+  'match.accept': 'Yes, it\'s a match!',
+  'match.reject': 'No, not a match',
+  'match.contact': 'Contact Owner',
+  
+  // Messages
+  'messages.title': 'Messages',
+  'messages.newMessage': 'New Message',
+  'messages.send': 'Send',
+  'messages.typeMessage': 'Type a message...',
+  'messages.noMessages': 'No messages yet',
+  'messages.unread': 'unread',
+  
+  // Notifications
+  'notifications.title': 'Notifications',
+  'notifications.markRead': 'Mark as read',
+  'notifications.markAllRead': 'Mark all as read',
+  'notifications.noNotifications': 'No notifications',
+  'notifications.settings': 'Notification Settings',
+  
+  // Community
+  'community.leaderboard': 'Leaderboard',
+  'community.points': 'points',
+  'community.rank': 'Rank',
+  'community.badges': 'Badges',
+  'community.posts': 'Posts',
+  'community.comments': 'Comments',
+  
+  // Settings
+  'settings.title': 'Settings',
+  'settings.account': 'Account',
+  'settings.privacy': 'Privacy',
+  'settings.notifications': 'Notifications',
+  'settings.language': 'Language',
+  'settings.theme': 'Theme',
+  'settings.help': 'Help & Support',
+  
+  // Success Messages
+  'success.reportCreated': 'Report created successfully',
+  'success.reportUpdated': 'Report updated successfully',
+  'success.reportDeleted': 'Report deleted successfully',
+  'success.matchFound': 'Match found!',
+  'success.messageSent': 'Message sent',
+  'success.profileUpdated': 'Profile updated',
+  
+  // Error Messages
+  'error.generic': 'Something went wrong',
+  'error.network': 'Network error. Please check your connection',
+  'error.notFound': 'Not found',
+  'error.unauthorized': 'Unauthorized access',
+  'error.validation': 'Please check your input',
+  'error.fileSize': 'File size too large'
 };
 
 // Spanish translations
 const es: Translations = {
-  common: {
-    appName: 'Rewardz',
-    tagline: 'Reuniendo Mascotas Perdidas',
-    search: 'Buscar',
-    cancel: 'Cancelar',
-    save: 'Guardar',
-    delete: 'Eliminar',
-    edit: 'Editar',
-    loading: 'Cargando...',
-    error: 'Error',
-    success: 'Éxito',
-    confirm: 'Confirmar',
-    back: 'Atrás',
-    next: 'Siguiente',
-    submit: 'Enviar',
-    close: 'Cerrar',
-    share: 'Compartir',
-    download: 'Descargar',
-    print: 'Imprimir'
-  },
-  navigation: {
-    home: 'Inicio',
-    alerts: 'Alertas',
-    search: 'Buscar',
-    community: 'Comunidad',
-    profile: 'Perfil',
-    messages: 'Mensajes',
-    notifications: 'Notificaciones',
-    settings: 'Configuración',
-    help: 'Ayuda',
-    logout: 'Cerrar Sesión'
-  },
-  pet: {
-    lost: 'Perdido',
-    found: 'Encontrado',
-    reunited: 'Reunido',
-    species: 'Especie',
-    breed: 'Raza',
-    color: 'Color',
-    name: 'Nombre',
-    description: 'Descripción',
-    lastSeen: 'Visto por Última Vez',
-    foundAt: 'Encontrado en',
-    reward: 'Recompensa',
-    microchip: 'ID de Microchip'
-  },
-  actions: {
-    reportLost: 'Reportar Mascota Perdida',
-    reportFound: 'Reportar Mascota Encontrada',
-    viewDetails: 'Ver Detalles',
-    contact: 'Contactar',
-    markReunited: 'Marcar como Reunido',
-    claimReward: 'Reclamar Recompensa',
-    sendMessage: 'Enviar Mensaje',
-    createPoster: 'Crear Póster',
-    viewOnMap: 'Ver en el Mapa'
-  },
-  messages: {
-    welcome: '¡Bienvenido de vuelta, {{name}}!',
-    noResults: 'No se encontraron resultados',
-    matchFound: '¡Coincidencia potencial encontrada!',
-    reportCreated: 'Reporte creado exitosamente',
-    reportUpdated: 'Reporte actualizado exitosamente',
-    reportDeleted: 'Reporte eliminado exitosamente',
-    messageSent: 'Mensaje enviado',
-    notificationSent: 'Notificación enviada',
-    errorOccurred: 'Ocurrió un error. Por favor intenta de nuevo.',
-    permissionDenied: 'Permiso denegado',
-    loginRequired: 'Por favor inicia sesión para continuar'
-  },
-  auth: {
-    login: 'Iniciar Sesión',
-    signup: 'Registrarse',
-    email: 'Correo Electrónico',
-    password: 'Contraseña',
-    confirmPassword: 'Confirmar Contraseña',
-    forgotPassword: '¿Olvidaste tu Contraseña?',
-    resetPassword: 'Restablecer Contraseña',
-    name: 'Nombre',
-    phone: 'Teléfono',
-    createAccount: 'Crear Cuenta',
-    alreadyHaveAccount: '¿Ya tienes una cuenta?',
-    dontHaveAccount: '¿No tienes una cuenta?'
-  }
+  // Navigation
+  'nav.home': 'Inicio',
+  'nav.search': 'Buscar',
+  'nav.alerts': 'Alertas',
+  'nav.community': 'Comunidad',
+  'nav.profile': 'Perfil',
+  'nav.messages': 'Mensajes',
+  'nav.notifications': 'Notificaciones',
+  
+  // Common
+  'common.loading': 'Cargando...',
+  'common.error': 'Error',
+  'common.success': 'Éxito',
+  'common.save': 'Guardar',
+  'common.cancel': 'Cancelar',
+  'common.delete': 'Eliminar',
+  'common.edit': 'Editar',
+  'common.view': 'Ver',
+  'common.share': 'Compartir',
+  'common.download': 'Descargar',
+  'common.search': 'Buscar',
+  'common.filter': 'Filtrar',
+  'common.sort': 'Ordenar',
+  'common.back': 'Atrás',
+  'common.next': 'Siguiente',
+  'common.submit': 'Enviar',
+  'common.close': 'Cerrar',
+  
+  // Auth
+  'auth.login': 'Iniciar Sesión',
+  'auth.signup': 'Registrarse',
+  'auth.logout': 'Cerrar Sesión',
+  'auth.forgotPassword': '¿Olvidaste tu contraseña?',
+  'auth.resetPassword': 'Restablecer Contraseña',
+  'auth.email': 'Correo Electrónico',
+  'auth.password': 'Contraseña',
+  'auth.confirmPassword': 'Confirmar Contraseña',
+  'auth.name': 'Nombre',
+  
+  // Pet Report
+  'report.lost': 'Perdido',
+  'report.found': 'Encontrado',
+  'report.title': 'Reportar Mascota',
+  'report.petName': 'Nombre de Mascota',
+  'report.species': 'Especie',
+  'report.breed': 'Raza',
+  'report.color': 'Color',
+  'report.location': 'Ubicación',
+  'report.lastSeen': 'Visto por Última Vez',
+  'report.reward': 'Recompensa',
+  'report.description': 'Descripción',
+  'report.contact': 'Contacto',
+  'report.status.open': 'Abierto',
+  'report.status.closed': 'Cerrado',
+  'report.status.reunited': 'Reunido',
+  
+  // Matching
+  'match.title': '¡Posible Coincidencia Encontrada!',
+  'match.score': 'Puntuación de Coincidencia',
+  'match.confidence': 'Confianza',
+  'match.reasons': 'Por qué creemos que coincide',
+  'match.accept': '¡Sí, es una coincidencia!',
+  'match.reject': 'No, no coincide',
+  'match.contact': 'Contactar Dueño',
+  
+  // Messages
+  'messages.title': 'Mensajes',
+  'messages.newMessage': 'Nuevo Mensaje',
+  'messages.send': 'Enviar',
+  'messages.typeMessage': 'Escribe un mensaje...',
+  'messages.noMessages': 'No hay mensajes',
+  'messages.unread': 'sin leer',
+  
+  // Notifications
+  'notifications.title': 'Notificaciones',
+  'notifications.markRead': 'Marcar como leído',
+  'notifications.markAllRead': 'Marcar todo como leído',
+  'notifications.noNotifications': 'Sin notificaciones',
+  'notifications.settings': 'Configuración de Notificaciones',
+  
+  // Community
+  'community.leaderboard': 'Tabla de Posiciones',
+  'community.points': 'puntos',
+  'community.rank': 'Rango',
+  'community.badges': 'Insignias',
+  'community.posts': 'Publicaciones',
+  'community.comments': 'Comentarios',
+  
+  // Settings
+  'settings.title': 'Configuración',
+  'settings.account': 'Cuenta',
+  'settings.privacy': 'Privacidad',
+  'settings.notifications': 'Notificaciones',
+  'settings.language': 'Idioma',
+  'settings.theme': 'Tema',
+  'settings.help': 'Ayuda y Soporte',
+  
+  // Success Messages
+  'success.reportCreated': 'Reporte creado exitosamente',
+  'success.reportUpdated': 'Reporte actualizado exitosamente',
+  'success.reportDeleted': 'Reporte eliminado exitosamente',
+  'success.matchFound': '¡Coincidencia encontrada!',
+  'success.messageSent': 'Mensaje enviado',
+  'success.profileUpdated': 'Perfil actualizado',
+  
+  // Error Messages
+  'error.generic': 'Algo salió mal',
+  'error.network': 'Error de red. Por favor verifica tu conexión',
+  'error.notFound': 'No encontrado',
+  'error.unauthorized': 'Acceso no autorizado',
+  'error.validation': 'Por favor verifica tu entrada',
+  'error.fileSize': 'Archivo demasiado grande'
 };
 
-// French translations
-const fr: Translations = {
-  common: {
-    appName: 'Rewardz',
-    tagline: 'Retrouver les Animaux Perdus',
-    search: 'Rechercher',
-    cancel: 'Annuler',
-    save: 'Enregistrer',
-    delete: 'Supprimer',
-    edit: 'Modifier',
-    loading: 'Chargement...',
-    error: 'Erreur',
-    success: 'Succès',
-    confirm: 'Confirmer',
-    back: 'Retour',
-    next: 'Suivant',
-    submit: 'Soumettre',
-    close: 'Fermer',
-    share: 'Partager',
-    download: 'Télécharger',
-    print: 'Imprimer'
-  },
-  navigation: {
-    home: 'Accueil',
-    alerts: 'Alertes',
-    search: 'Rechercher',
-    community: 'Communauté',
-    profile: 'Profil',
-    messages: 'Messages',
-    notifications: 'Notifications',
-    settings: 'Paramètres',
-    help: 'Aide',
-    logout: 'Déconnexion'
-  },
-  pet: {
-    lost: 'Perdu',
-    found: 'Trouvé',
-    reunited: 'Réuni',
-    species: 'Espèce',
-    breed: 'Race',
-    color: 'Couleur',
-    name: 'Nom',
-    description: 'Description',
-    lastSeen: 'Vu Pour la Dernière Fois',
-    foundAt: 'Trouvé à',
-    reward: 'Récompense',
-    microchip: 'ID de Micropuce'
-  },
-  actions: {
-    reportLost: 'Signaler un Animal Perdu',
-    reportFound: 'Signaler un Animal Trouvé',
-    viewDetails: 'Voir les Détails',
-    contact: 'Contact',
-    markReunited: 'Marquer comme Réuni',
-    claimReward: 'Réclamer la Récompense',
-    sendMessage: 'Envoyer un Message',
-    createPoster: 'Créer une Affiche',
-    viewOnMap: 'Voir sur la Carte'
-  },
-  messages: {
-    welcome: 'Bienvenue, {{name}}!',
-    noResults: 'Aucun résultat trouvé',
-    matchFound: 'Correspondance potentielle trouvée!',
-    reportCreated: 'Rapport créé avec succès',
-    reportUpdated: 'Rapport mis à jour avec succès',
-    reportDeleted: 'Rapport supprimé avec succès',
-    messageSent: 'Message envoyé',
-    notificationSent: 'Notification envoyée',
-    errorOccurred: 'Une erreur est survenue. Veuillez réessayer.',
-    permissionDenied: 'Permission refusée',
-    loginRequired: 'Veuillez vous connecter pour continuer'
-  },
-  auth: {
-    login: 'Connexion',
-    signup: "S'inscrire",
-    email: 'Email',
-    password: 'Mot de Passe',
-    confirmPassword: 'Confirmer le Mot de Passe',
-    forgotPassword: 'Mot de Passe Oublié?',
-    resetPassword: 'Réinitialiser le Mot de Passe',
-    name: 'Nom',
-    phone: 'Téléphone',
-    createAccount: 'Créer un Compte',
-    alreadyHaveAccount: 'Vous avez déjà un compte?',
-    dontHaveAccount: "Vous n'avez pas de compte?"
-  }
-};
-
-// Swahili translations (East Africa)
-const sw: Translations = {
-  common: {
-    appName: 'Rewardz',
-    tagline: 'Kurudisha Wanyama Waliopotea',
-    search: 'Tafuta',
-    cancel: 'Ghairi',
-    save: 'Hifadhi',
-    delete: 'Futa',
-    edit: 'Hariri',
-    loading: 'Inapakia...',
-    error: 'Kosa',
-    success: 'Mafanikio',
-    confirm: 'Thibitisha',
-    back: 'Nyuma',
-    next: 'Mbele',
-    submit: 'Tuma',
-    close: 'Funga',
-    share: 'Shiriki',
-    download: 'Pakua',
-    print: 'Chapisha'
-  },
-  navigation: {
-    home: 'Nyumbani',
-    alerts: 'Tahadhari',
-    search: 'Tafuta',
-    community: 'Jamii',
-    profile: 'Wasifu',
-    messages: 'Ujumbe',
-    notifications: 'Arifa',
-    settings: 'Mipangilio',
-    help: 'Msaada',
-    logout: 'Ondoka'
-  },
-  pet: {
-    lost: 'Amepotea',
-    found: 'Amepatikana',
-    reunited: 'Amerudi',
-    species: 'Aina',
-    breed: 'Mbegu',
-    color: 'Rangi',
-    name: 'Jina',
-    description: 'Maelezo',
-    lastSeen: 'Alionekana Mwisho',
-    foundAt: 'Alipatikana',
-    reward: 'Tuzo',
-    microchip: 'Kitambulisho cha Microchip'
-  },
-  actions: {
-    reportLost: 'Ripoti Mnyama Aliyepotea',
-    reportFound: 'Ripoti Mnyama Aliyepatikana',
-    viewDetails: 'Ona Maelezo',
-    contact: 'Wasiliana',
-    markReunited: 'Weka Alama Amerudi',
-    claimReward: 'Dai Tuzo',
-    sendMessage: 'Tuma Ujumbe',
-    createPoster: 'Tengeneza Bango',
-    viewOnMap: 'Ona Kwenye Ramani'
-  },
-  messages: {
-    welcome: 'Karibu tena, {{name}}!',
-    noResults: 'Hakuna matokeo yaliyopatikana',
-    matchFound: 'Mechi inayoweza kupatikana!',
-    reportCreated: 'Ripoti imeundwa kwa mafanikio',
-    reportUpdated: 'Ripoti imesasishwa kwa mafanikio',
-    reportDeleted: 'Ripoti imefutwa kwa mafanikio',
-    messageSent: 'Ujumbe umetumwa',
-    notificationSent: 'Arifa imetumwa',
-    errorOccurred: 'Kosa limetokea. Tafadhali jaribu tena.',
-    permissionDenied: 'Ruhusa imekataliwa',
-    loginRequired: 'Tafadhali ingia ili uendelee'
-  },
-  auth: {
-    login: 'Ingia',
-    signup: 'Jisajili',
-    email: 'Barua Pepe',
-    password: 'Nenosiri',
-    confirmPassword: 'Thibitisha Nenosiri',
-    forgotPassword: 'Umesahau Nenosiri?',
-    resetPassword: 'Weka Upya Nenosiri',
-    name: 'Jina',
-    phone: 'Simu',
-    createAccount: 'Tengeneza Akaunti',
-    alreadyHaveAccount: 'Una akaunti tayari?',
-    dontHaveAccount: 'Hauna akaunti?'
-  }
-};
-
-// Store translations
-const translations: Record<Language, Translations> = {
+// Translation map
+export const translations: Record<LanguageCode, Translations> = {
   en,
   es,
-  fr,
-  sw,
-  zu: en // Fallback to English for Zulu (not implemented)
+  // Other languages would have basic English fallback
+  fr: en,
+  de: en,
+  pt: en,
+  zh: en,
+  ar: en,
+  hi: en,
+  sw: en
 };
 
-// Current language state
-let currentLanguage: Language = 'en';
-
-// Get saved language from localStorage
-if (typeof window !== 'undefined') {
-  const saved = localStorage.getItem('language') as Language;
-  if (saved && translations[saved]) {
-    currentLanguage = saved;
-  } else {
-    // Try to detect browser language
-    const browserLang = navigator.language.split('-')[0];
-    if (browserLang in translations) {
-      currentLanguage = browserLang as Language;
-    }
-  }
+// i18n Context
+interface I18nContextValue {
+  language: LanguageCode;
+  setLanguage: (lang: LanguageCode) => void;
+  t: (key: keyof Translations, params?: Record<string, any>) => string;
+  dir: 'ltr' | 'rtl';
 }
 
-/**
- * Get current language
- */
-export function getCurrentLanguage(): Language {
-  return currentLanguage;
+const I18nContext = createContext<I18nContextValue | undefined>(undefined);
+
+export const useI18n = () => {
+  const context = useContext(I18nContext);
+  if (!context) {
+    throw new Error('useI18n must be used within I18nProvider');
+  }
+  return context;
+};
+
+export const I18nProvider = I18nContext.Provider;
+
+// Helper function to get translation
+export function getTranslation(
+  language: LanguageCode,
+  key: keyof Translations,
+  params?: Record<string, any>
+): string {
+  const translation = translations[language]?.[key] || translations.en[key] || key;
+  
+  if (!params) return translation;
+  
+  // Replace parameters in translation
+  return Object.entries(params).reduce(
+    (str, [param, value]) => str.replace(`{{${param}}}`, String(value)),
+    translation
+  );
 }
 
-/**
- * Set current language
- */
-export function setLanguage(lang: Language) {
-  currentLanguage = lang;
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('language', lang);
-    // Trigger language change event
-    window.dispatchEvent(new CustomEvent('languageChange', { detail: lang }));
-  }
+// Get browser language
+export function getBrowserLanguage(): LanguageCode {
+  const browserLang = navigator.language.split('-')[0];
+  return (browserLang in LANGUAGES ? browserLang : 'en') as LanguageCode;
 }
 
-/**
- * Get translation for a key
- */
-export function t(key: string, params?: Record<string, any>): string {
-  const keys = key.split('.');
-  let value: any = translations[currentLanguage];
-  
-  for (const k of keys) {
-    if (value && typeof value === 'object' && k in value) {
-      value = value[k];
-    } else {
-      // Fallback to English
-      value = translations.en;
-      for (const k2 of keys) {
-        if (value && typeof value === 'object' && k2 in value) {
-          value = value[k2];
-        } else {
-          return key; // Return key if translation not found
-        }
-      }
-      break;
-    }
-  }
-  
-  if (typeof value !== 'string') {
-    return key;
-  }
-  
-  // Replace parameters
-  if (params) {
-    for (const [param, val] of Object.entries(params)) {
-      value = value.replace(`{{${param}}}`, String(val));
-    }
-  }
-  
-  return value;
+// Get text direction for language
+export function getTextDirection(language: LanguageCode): 'ltr' | 'rtl' {
+  return language === 'ar' ? 'rtl' : 'ltr';
 }
 
-/**
- * Get all available languages
- */
-export function getAvailableLanguages(): Array<{ code: Language; name: string }> {
-  return [
-    { code: 'en', name: 'English' },
-    { code: 'es', name: 'Español' },
-    { code: 'fr', name: 'Français' },
-    { code: 'sw', name: 'Kiswahili' }
-  ];
-}
-
-/**
- * React hook for translations
- */
-export function useTranslation() {
-  const [, forceUpdate] = useState({});
-  
-  useEffect(() => {
-    const handleLanguageChange = () => {
-      forceUpdate({});
-    };
-    
-    window.addEventListener('languageChange', handleLanguageChange);
-    return () => {
-      window.removeEventListener('languageChange', handleLanguageChange);
-    };
-  }, []);
-  
-  return {
-    t,
-    currentLanguage: getCurrentLanguage(),
-    setLanguage,
-    languages: getAvailableLanguages()
+// Format number based on locale
+export function formatNumber(value: number, language: LanguageCode): string {
+  const locales: Record<LanguageCode, string> = {
+    en: 'en-US',
+    es: 'es-ES',
+    fr: 'fr-FR',
+    de: 'de-DE',
+    pt: 'pt-BR',
+    zh: 'zh-CN',
+    ar: 'ar-SA',
+    hi: 'hi-IN',
+    sw: 'sw-KE'
   };
+  
+  return new Intl.NumberFormat(locales[language]).format(value);
 }
 
-// Export for direct usage
-export default {
-  t,
-  getCurrentLanguage,
-  setLanguage,
-  getAvailableLanguages
-};
+// Format date based on locale
+export function formatDate(date: Date, language: LanguageCode, options?: Intl.DateTimeFormatOptions): string {
+  const locales: Record<LanguageCode, string> = {
+    en: 'en-US',
+    es: 'es-ES',
+    fr: 'fr-FR',
+    de: 'de-DE',
+    pt: 'pt-BR',
+    zh: 'zh-CN',
+    ar: 'ar-SA',
+    hi: 'hi-IN',
+    sw: 'sw-KE'
+  };
+  
+  return new Intl.DateTimeFormat(locales[language], options).format(date);
+}
+
+// Format currency
+export function formatCurrency(amount: number, language: LanguageCode, currency = 'USD'): string {
+  const locales: Record<LanguageCode, string> = {
+    en: 'en-US',
+    es: 'es-ES',
+    fr: 'fr-FR',
+    de: 'de-DE',
+    pt: 'pt-BR',
+    zh: 'zh-CN',
+    ar: 'ar-SA',
+    hi: 'hi-IN',
+    sw: 'sw-KE'
+  };
+  
+  return new Intl.NumberFormat(locales[language], {
+    style: 'currency',
+    currency
+  }).format(amount);
+}
