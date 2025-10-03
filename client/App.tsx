@@ -1,6 +1,8 @@
 import "./global.css";
 import { useEffect } from "react";
 import "@/lib/fetchPatch";
+import PWAInstaller from "@/components/PWAInstaller";
+import { initializePushNotifications } from "@/lib/pushNotifications";
 
 import { Toaster } from "@/components/ui/toaster";
 import { createRoot } from "react-dom/client";
@@ -19,7 +21,7 @@ import Onboarding from "./pages/Onboarding";
 import GetStarted from "./pages/GetStarted";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Notifications from "./pages/Notifications";
+import Notifications from "./pages/NotificationsEnhanced";
 import ResetPassword from "./pages/ResetPassword";
 import RequireAuth from "@/components/RequireAuth";
 import ReportLost from "./pages/ReportLost";
@@ -32,37 +34,44 @@ import ClaimReward from "./pages/ClaimReward";
 import Match from "./pages/Match";
 import OwnerContact from "./pages/OwnerContact";
 import ReportView from "./pages/ReportView";
-import Poster from "./pages/Poster";
+import Poster from "./pages/PosterEnhanced";
 import Dialer from "./pages/Dialer";
-import AlertsMap from "./pages/AlertsMap";
+import AlertsMap from "./pages/AlertsMapEnhanced";
 import Saved from "./pages/Saved";
-import EditReport from "./pages/EditReport";
-import Messages from "./pages/Messages";
+import EditReport from "./pages/EditReportEnhanced";
+import Messages from "./pages/MessagesEnhanced";
 import NotificationSettings from "./pages/NotificationSettings";
 import MessageSettings from "./pages/MessageSettings";
 import Account from "./pages/Account";
 import Help from "./pages/Help";
 import Privacy from "./pages/Privacy";
-import SavedSearches from "./pages/SavedSearches";
+import SavedSearches from "./pages/SavedSearchesEnhanced";
 import Pets from "./pages/Pets";
 import PetEdit from "./pages/PetEdit";
 import PetView from "./pages/PetView";
-import Admin from "./pages/Admin";
+import Admin from "./pages/AdminDashboard";
 import PetOnboarding from "./pages/PetOnboarding";
 import { UserProvider } from "./context/UserContext";
 import GlobalErrors from "@/components/GlobalErrors";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+const App = () => {
+  useEffect(() => {
+    // Initialize push notifications
+    initializePushNotifications();
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
         <GlobalErrors />
-      <Toaster />
-      <Sonner />
-      <UserProvider>
-        <BrowserRouter>
-          <Routes>
+        <Toaster />
+        <Sonner />
+        <PWAInstaller />
+        <UserProvider>
+          <BrowserRouter>
+            <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/alerts" element={<Alerts />} />
             <Route path="/alerts/map" element={<AlertsMap />} />
@@ -199,7 +208,8 @@ const App = () => (
       </UserProvider>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 const rootEl = document.getElementById("root");
 if (rootEl) {

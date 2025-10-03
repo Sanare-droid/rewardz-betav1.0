@@ -6,6 +6,7 @@ import { db, storage } from "@/lib/firebase";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useUser } from "@/context/UserContext";
+import { autoMatch } from "@/lib/matching";
 import { geocode, tokenize } from "@/lib/geo";
 import {
   SPECIES_OPTIONS,
@@ -100,6 +101,12 @@ export default function ReportFound() {
           }
         }
       } catch {}
+      
+      // Run auto-matching in the background
+      autoMatch(refDoc.id).catch(error => {
+        console.error('Auto-matching failed:', error);
+      });
+      
       navigate(`/report-submitted?id=${refDoc.id}`);
     } catch (e: any) {
       setError(e?.message || "Failed to submit report");

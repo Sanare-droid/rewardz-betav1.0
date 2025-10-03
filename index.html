@@ -4,15 +4,40 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <title>Rewardz - Pet Reward Platform</title>
-    <meta name="description" content="Rewardz is a comprehensive pet reward platform that helps pet owners connect, share, and reward each other for pet care activities." />
-    <meta name="keywords" content="pet rewards, pet platform, pet community, rewards system" />
+    <title>Rewardz - Pet Recovery Platform</title>
+    <meta name="description" content="Rewardz is a comprehensive pet recovery platform that helps reunite lost pets with their families through smart matching, real-time alerts, and community support." />
+    <meta name="keywords" content="lost pets, found pets, pet recovery, pet matching, rewards system, community" />
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#7c3aed" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    
+    <!-- iOS Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Rewardz" />
   </head>
 
   <body>
     <div id="root"></div>
 
     <script type="module" src="/client/App.tsx"></script>
+    
+    <!-- Register Service Worker -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('Service Worker registered:', registration);
+            })
+            .catch(error => {
+              console.error('Service Worker registration failed:', error);
+            });
+        });
+      }
+    </script>
   </body>
 </html>

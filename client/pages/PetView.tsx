@@ -25,10 +25,12 @@ export default function PetView() {
       {pet ? (
         <div className="mt-2">
           {pet.photoUrl && (
-            <img
-              src={pet.photoUrl}
-              className="h-40 w-full object-cover rounded-xl"
-            />
+            <div className="h-40 w-full rounded-xl overflow-hidden bg-muted">
+              <img
+                src={pet.photoUrl}
+                className="w-full h-full object-cover"
+              />
+            </div>
           )}
           <div className="mt-3 rounded-xl border p-3">
             <div className="font-semibold text-lg">{pet.name || "Pet"}</div>

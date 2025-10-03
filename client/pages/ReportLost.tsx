@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useUser } from "@/context/UserContext";
+import { autoMatch } from "@/lib/matching";
 import { geocode, tokenize } from "@/lib/geo";
 import {
   SPECIES_OPTIONS,
@@ -116,6 +117,11 @@ export default function ReportLost() {
             });
         }
       } catch {}
+      // Run auto-matching in the background
+      autoMatch(refDoc.id).catch(error => {
+        console.error('Auto-matching failed:', error);
+      });
+      
       navigate(
         offerReward
           ? `/payment?report=${refDoc.id}&amount=${rewardAmount}`

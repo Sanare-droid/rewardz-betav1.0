@@ -1,26 +1,53 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    function isSignedIn() { return request.auth != null; }
-    function isImage() { return request.resource.contentType.matches('image/.*'); }
-    function smallFile() { return request.resource.size < 5 * 1024 * 1024; }
-
-    // Post images
-    match /posts/{userId}/{allPaths=**} {
-      allow read: if true;
-      allow write: if isSignedIn() && request.auth.uid == userId && isImage() && smallFile();
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
     }
-
-    // Report images
-    match /reports/{userId}/{allPaths=**} {
-      allow read: if true;
-      allow write: if isSignedIn() && request.auth.uid == userId && isImage() && smallFile();
+    
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
     }
-
+    
+    function isValidImage() {
+      return request.resource.contentType.matches('image/.*') && 
+             request.resource.size < 10 * 1024 * 1024; // 10MB max
+    }
+    
+    // User profile images
+    match /users/{userId}/profile/{fileName} {
+      allow read: if true; // Public profiles
+      allow write: if isOwner(userId) && isValidImage();
+      allow delete: if isOwner(userId);
+    }
+    
     // Pet images
-    match /pets/{userId}/{allPaths=**} {
-      allow read: if true;
-      allow write: if isSignedIn() && request.auth.uid == userId && isImage() && smallFile();
+    match /pets/{petId}/{fileName} {
+      allow read: if true; // Public pet images
+      allow write: if isAuthenticated() && isValidImage();
+      allow delete: if isAuthenticated();
+    }
+    
+    // Report images (lost/found pets)
+    match /reports/{reportId}/{fileName} {
+      allow read: if true; // Public reports
+      allow write: if isAuthenticated() && isValidImage();
+      allow delete: if isAuthenticated();
+    }
+    
+    // Community post images
+    match /posts/{postId}/{fileName} {
+      allow read: if true; // Public forum
+      allow write: if isAuthenticated() && isValidImage();
+      allow delete: if isAuthenticated();
+    }
+    
+    // Temporary uploads (for image processing)
+    match /temp/{userId}/{fileName} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && isValidImage();
+      allow delete: if isOwner(userId);
     }
   }
 }

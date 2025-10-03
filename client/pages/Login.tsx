@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import { useUser } from "@/context/UserContext";
 import { friendlyAuthError } from "@/lib/auth";
+import { db } from "@/lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 export default function Login() {
   const emailRef = useRef<HTMLInputElement>(null);
@@ -69,7 +71,36 @@ export default function Login() {
               const email = emailRef.current?.value?.trim() || "";
               const password = passwordRef.current?.value || "";
               await login(email, password);
-              navigate("/");
+              
+              // Wait a moment for auth to stabilize
+              await new Promise(resolve => setTimeout(resolve, 500));
+              
+              // Check if user has pets after login
+              const { auth } = await import("@/lib/firebase");
+              if (auth.currentUser) {
+                try {
+                  const petsSnapshot = await getDocs(
+                    collection(db, "users", auth.currentUser.uid, "pets")
+                  );
+                  
+                  if (petsSnapshot.empty) {
+                    // No pets, go to pet onboarding
+                    console.log("No pets found, redirecting to pet onboarding");
+                    navigate("/pet-onboarding");
+                  } else {
+                    // Has pets, go to home
+                    console.log("Pets found, redirecting to home");
+                    navigate("/");
+                  }
+                } catch (error) {
+                  console.error("Error checking pets:", error);
+                  // If we can't check pets, go to home
+                  navigate("/");
+                }
+              } else {
+                // No current user, go to home (shouldn't happen)
+                navigate("/");
+              }
             } catch (e: any) {
               setError(friendlyAuthError(e));
             } finally {
