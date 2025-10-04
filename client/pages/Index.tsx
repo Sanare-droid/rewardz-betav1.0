@@ -11,13 +11,16 @@ import {
   onSnapshot,
   orderBy,
   query,
+  getDocs,
 } from "firebase/firestore";
+import { useLocation } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 
 export default function Index() {
   const { user } = useUser();
   const name = user?.name || "there";
   const navigate = useNavigate();
+  const location = useLocation();
   const [recent, setRecent] = useState<any[]>([]);
 
   useEffect(() => {
@@ -34,16 +37,34 @@ export default function Index() {
 
   useEffect(() => {
     if (!user) return;
+    
+    // Check if onboarding was already completed or skipped
+    const onboardingKey = `onboarding_${user.uid}`;
+    const onboardingComplete = localStorage.getItem(onboardingKey);
     const skipped = localStorage.getItem("skipPetOnboarding") === "1";
-    if (skipped) return;
-    const col = collection(db, "users", user.uid, "pets");
-    const unsubPets = onSnapshot(col, (snap) => {
-      if (snap.size === 0) {
-        navigate("/pet-onboarding", { replace: true });
+    
+    if (onboardingComplete || skipped) return;
+    
+    // Only check once on mount, not continuously
+    const checkPets = async () => {
+      try {
+        const col = collection(db, "users", user.uid, "pets");
+        const snapshot = await getDocs(col);
+        
+        if (snapshot.size === 0 && location.pathname === '/') {
+          // Only redirect from home page to avoid loops
+          navigate("/pet-onboarding", { replace: true });
+        } else if (snapshot.size > 0) {
+          // Mark onboarding as complete if user has pets
+          localStorage.setItem(onboardingKey, "true");
+        }
+      } catch (error) {
+        console.error("Error checking pets:", error);
       }
-      unsubPets();
-    });
-  }, [user, navigate]);
+    };
+    
+    checkPets();
+  }, [user, navigate, location.pathname]);
 
   const cards = useMemo(() => {
     if (recent.length === 0) {
@@ -122,7 +143,7 @@ export default function Index() {
                 <img
                   src="https://cdn.builder.io/api/v1/image/assets%2F0f7bde685416479ab2cfdd2fa6980d09%2F6d2e3cc66b8e4929b3a236354b8ea6e1?format=webp&width=1200"
                   alt="Rewardz community hero"
-                  className="absolute inset-0 w-full h-full object-contain"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>
             </div>
@@ -210,7 +231,7 @@ function AlertCard({
               <img
                 src={image}
                 alt="Pet"
-                className="h-full w-full object-cover"
+                className="absolute inset-0 h-full w-full object-cover"
               />
             </AspectRatio>
           </div>

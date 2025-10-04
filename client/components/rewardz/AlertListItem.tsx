@@ -34,13 +34,15 @@ export default function AlertListItem({
       to={to || `/report/${id}`}
       className="flex items-center gap-3 py-3 border-b"
     >
-      <div className="relative h-14 w-14 rounded-lg overflow-hidden border">
+      <div className="relative h-14 w-14 rounded-lg overflow-hidden border flex-shrink-0 bg-muted">
         <img
           src={
             image ??
             "https://cdn.builder.io/api/v1/image/assets%2F0f7bde685416479ab2cfdd2fa6980d09%2Fbecfd88f2cca487b8d7408049a6a4f34?format=webp&width=800"
           }
-          className="h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+          alt={title || "Pet"}
         />
         {status && (
           <span

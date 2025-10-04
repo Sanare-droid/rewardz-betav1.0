@@ -19,13 +19,16 @@ export default function Profile() {
     <MobileLayout title="Profile">
       <div className="mt-2">
         <div className="flex items-center gap-4">
-          <img
-            src={
-              user?.photoURL ||
-              "https://cdn.builder.io/api/v1/image/assets%2F0f7bde685416479ab2cfdd2fa6980d09%2Fff10cdd90c224f579a914ee9f717dc9c?format=webp&width=800"
-            }
-            className="h-16 w-16 rounded-full object-cover"
-          />
+          <div className="h-16 w-16 rounded-full overflow-hidden bg-muted flex-shrink-0">
+            <img
+              src={
+                user?.photoURL ||
+                "https://cdn.builder.io/api/v1/image/assets%2F0f7bde685416479ab2cfdd2fa6980d09%2Fff10cdd90c224f579a914ee9f717dc9c?format=webp&width=800"
+              }
+              className="h-full w-full object-cover avatar-image"
+              alt="Profile"
+            />
+          </div>
           <div>
             <div className="text-lg font-semibold">
               {user?.name || "Member"}
@@ -69,6 +72,11 @@ export default function Profile() {
               className="w-full h-10 rounded-full"
               variant="outline"
               onClick={async () => {
+                // Clear all onboarding flags on logout
+                if (user?.uid) {
+                  localStorage.removeItem(`onboarding_${user.uid}`);
+                }
+                localStorage.removeItem("skipPetOnboarding");
                 await logout();
                 navigate("/splash");
               }}

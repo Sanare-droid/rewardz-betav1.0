@@ -34,11 +34,14 @@ export default function PetOnboarding() {
           <button
             className="block mx-auto text-primary underline"
             onClick={() => {
+              if (user?.uid) {
+                localStorage.setItem(`onboarding_${user.uid}`, "true");
+              }
               localStorage.setItem("skipPetOnboarding", "1");
               navigate("/");
             }}
           >
-            Skip for now
+            Skip for now (You can add pets later from your profile)
           </button>
         </div>
       </div>

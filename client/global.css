@@ -112,4 +112,31 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Prevent images from stretching/zooming - maintain aspect ratio */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Fix for avatar images - maintain proper crop */
+  .avatar-image,
+  [class*="rounded-full"] img {
+    object-fit: cover;
+  }
+
+  /* Fix for card images - ensure proper coverage */
+  .card-image,
+  .report-image,
+  .pet-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  /* Ensure images in aspect ratio containers fill properly */
+  [data-radix-aspect-ratio-wrapper] img {
+    object-fit: cover;
+  }
 }
