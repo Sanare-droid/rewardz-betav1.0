@@ -19,13 +19,13 @@ export default function Onboarding() {
       <div className="mt-2">
         {step === 0 && (
           <div>
-            <div className="relative">
+            <div className="relative h-64 w-full rounded-3xl overflow-hidden bg-muted">
               <img
                 src="https://cdn.builder.io/api/v1/image/assets%2F0f7bde685416479ab2cfdd2fa6980d09%2F3ca9917ebefd47a4a4d27aadaa32eaa2?format=webp&width=800"
-                className="h-64 w-full object-cover rounded-3xl"
+                className="absolute inset-0 w-full h-full object-contain"
                 alt="Welcome hero"
               />
-              <h2 className="absolute left-5 top-5 text-white text-2xl font-bold drop-shadow-md">
+              <h2 className="absolute left-5 top-5 text-white text-2xl font-bold drop-shadow-md z-10">
                 Welcome to Rewardz!
               </h2>
             </div>
@@ -37,11 +37,13 @@ export default function Onboarding() {
         )}
         {step === 1 && (
           <div>
-            <img
-              src="https://cdn.builder.io/api/v1/image/assets%2F0f7bde685416479ab2cfdd2fa6980d09%2Fa12a7ec6defe4ebf9491effb04b405b9?format=webp&width=800"
-              className="h-64 w-full object-cover rounded-3xl"
-              alt="How it works"
-            />
+            <div className="relative h-64 w-full rounded-3xl overflow-hidden bg-muted">
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2F0f7bde685416479ab2cfdd2fa6980d09%2Fa12a7ec6defe4ebf9491effb04b405b9?format=webp&width=800"
+                className="absolute inset-0 w-full h-full object-contain"
+                alt="How it works"
+              />
+            </div>
             <h3 className="mt-6 text-xl font-semibold text-primary">
               How Rewardz Works
             </h3>
@@ -55,11 +57,13 @@ export default function Onboarding() {
         )}
         {step === 2 && (
           <div>
-            <img
-              src="https://cdn.builder.io/api/v1/image/assets%2F0f7bde685416479ab2cfdd2fa6980d09%2Fc1f8d7368ad146c5b033e2a142fd133b?format=webp&width=800"
-              className="h-64 w-full object-cover rounded-3xl"
-              alt="Join community"
-            />
+            <div className="relative h-64 w-full rounded-3xl overflow-hidden bg-muted">
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2F0f7bde685416479ab2cfdd2fa6980d09%2Fc1f8d7368ad146c5b033e2a142fd133b?format=webp&width=800"
+                className="absolute inset-0 w-full h-full object-contain"
+                alt="Join community"
+              />
+            </div>
             <h3 className="mt-6 text-xl font-semibold text-primary">
               Join the Rewardz Community
             </h3>
