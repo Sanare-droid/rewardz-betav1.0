@@ -308,7 +308,7 @@ export default function Alerts() {
             <AlertListItem
               key={r.id}
               id={r.id}
-              title={`${r.type === "lost" ? "Lost" : "Found"} ${r.species || "Pet"}`}
+              title={r.name || `${r.type === "lost" ? "Lost" : "Found"} ${r.species || "Pet"}`}
               subtitle={`${r.location || "Unknown"}`}
               badge={r.rewardAmount ? `$${r.rewardAmount}` : undefined}
               accent={r.type === "lost" ? "berry" : "teal"}
