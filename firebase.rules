@@ -85,9 +85,16 @@ service cloud.firestore {
     // Forums
     match /forums/{forumId} {
       allow read: if true;
-      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
-      allow update: if isSignedIn() && resource.data.authorId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow update: if isSignedIn();
       allow delete: if false;
+
+      match /members/{memberId} {
+        allow read: if true;
+        allow create: if isSignedIn();
+        allow update: if isSignedIn();
+        allow delete: if isSignedIn();
+      }
     }
 
     // Announcements
